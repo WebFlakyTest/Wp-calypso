@@ -31,7 +31,7 @@ describe( DataHelper.createSuiteTitle( 'Theme: Preview' ), function () {
 		await themesPage.search( themeName );
 	} );
 
-	it( 'Select Twenty Seventeen', async function () {
+	it( `Select ${ themeName }`, async function () {
 		await themesPage.select( themeName );
 	} );
 

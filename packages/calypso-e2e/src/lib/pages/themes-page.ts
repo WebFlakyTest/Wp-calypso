@@ -47,6 +47,7 @@ export class ThemesPage extends BaseContainer {
 		await Promise.all( [
 			this.page.waitForSelector( selectors.spinner, { state: 'hidden' } ),
 			this.page.waitForSelector( selectors.placeholder, { state: 'hidden' } ),
+			this.page.waitForLoadState( 'domcontentloaded' ),
 		] );
 	}
 
@@ -58,9 +59,16 @@ export class ThemesPage extends BaseContainer {
 	 * @throws {Error} If selected state of the theme filter button could not be confirmed.
 	 */
 	async filterThemes( type: 'All' | 'Free' | 'Premium' ): Promise< void > {
+		const showAllThemesButton = await this.page.waitForSelector( selectors.showAllThemesButton, {
+			state: 'visible',
+		} );
+		await showAllThemesButton.waitForElementState( 'stable' );
+
 		// Click the 'Show all themes' button at bottom of gallery to expose the theme toolbar.
-		await this.page.click( selectors.showAllThemesButton );
-		const searchToolbar = await this.page.waitForSelector( selectors.searchToolbar );
+		await showAllThemesButton.click();
+		const searchToolbar = await this.page.waitForSelector( selectors.searchToolbar, {
+			state: 'visible',
+		} );
 
 		// Retrive the target button.
 		const button = await searchToolbar.waitForSelector(
