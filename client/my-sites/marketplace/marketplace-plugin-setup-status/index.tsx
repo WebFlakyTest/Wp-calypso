@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ThemeProvider } from 'emotion-theming';
 import { useSelector, useDispatch } from 'react-redux';
 import page from 'page';
@@ -37,12 +37,13 @@ import {
 	isFetched as getIsWporgPluginFetched,
 	getPlugin as getWporgPlugin,
 } from 'calypso/state/plugins/wporg/selectors';
-import { marketplaceDebugger } from 'calypso/my-sites/marketplace/constants';
+import { getPluginsToInstall, marketplaceDebugger } from 'calypso/my-sites/marketplace/constants';
 
 /**
  * Style dependencies
  */
 import 'calypso/my-sites/marketplace/marketplace-plugin-setup-status/style.scss';
+import { IProductGroupCollection } from 'calypso/my-sites/marketplace/types';
 
 /**
  * This page busy waits and installs any plugins that are required in the marketplace purchase flow.
@@ -50,6 +51,7 @@ import 'calypso/my-sites/marketplace/marketplace-plugin-setup-status/style.scss'
 function WrappedMarketplacePluginSetup(): JSX.Element {
 	const translate = useTranslate();
 	const dispatch = useDispatch();
+	const [ pluginSlugToBeInstalled, setPluginSlugToBeInstalled ] = useState< string >();
 	const selectedSiteSlug = useSelector( getSelectedSiteSlug );
 	const selectedSiteId = useSelector( getSelectedSiteId );
 	const {
@@ -57,9 +59,12 @@ function WrappedMarketplacePluginSetup(): JSX.Element {
 		status: automatedTransferStatus,
 	} = useSelector( ( state ) => getAutomatedTransfer( state, selectedSiteId ) );
 
-	const { pluginSlugToBeInstalled, siteTransferStatus, pluginInstallationStatus } = useSelector(
-		getPurchaseFlowState
-	);
+	const {
+		productSlugInstalled,
+		productGroupSlug,
+		siteTransferStatus,
+		pluginInstallationStatus,
+	} = useSelector( getPurchaseFlowState );
 	const hasProductSetupError = useSelector( getHasProductSetupError );
 	const isProductSetupComplete = useSelector( getIsProductSetupComplete );
 
@@ -82,21 +87,36 @@ function WrappedMarketplacePluginSetup(): JSX.Element {
 	useEffect( () => {
 		if ( ! selectedSiteSlug ) {
 			page( '/home' );
-		} else if ( ! pluginSlugToBeInstalled ) {
-			// A plugin slug should have been provided to reach this page
+		} else if ( ! productSlugInstalled ) {
 			marketplaceDebugger(
-				'::MARKETPLACE::ERROR:: There is an error in plugin setup page pluginSlugToBeInstalled is not provided'
+				'::MARKETPLACE::ERROR:: There is an error in plugin setup page productSlugInstalled is not provided'
 			);
 			page( `/home/${ selectedSiteSlug }` );
+		} else {
+			// TODO: handle installation of multiple plugins
+			const plugins =
+				productGroupSlug &&
+				productSlugInstalled &&
+				getPluginsToInstall( productGroupSlug, productSlugInstalled );
+			Array.isArray( plugins ) && setPluginSlugToBeInstalled( plugins[ 0 ] );
 		}
-	}, [ dispatch, pluginSlugToBeInstalled, selectedSiteSlug ] );
+	}, [
+		dispatch,
+		pluginSlugToBeInstalled,
+		productGroupSlug,
+		productSlugInstalled,
+		selectedSiteSlug,
+	] );
 
 	useEffect( () => {
 		if ( hasProductSetupError ) {
 			marketplaceDebugger( '::MARKETPLACE::ERROR:: There is an error in product setup' );
+			const productGroupSlug: keyof IProductGroupCollection = findProductGroup(
+				productSlugInstalled
+			);
 			selectedSiteSlug &&
-				pluginSlugToBeInstalled &&
-				navigateToProductHomePage( selectedSiteSlug, pluginSlugToBeInstalled );
+				productSlugInstalled &&
+				navigateToProductHomePage( selectedSiteSlug, productGroupSlug );
 		} else if ( isProductSetupComplete ) {
 			/**
 			 * Wait for simulated progressbar to catchup
@@ -115,7 +135,7 @@ function WrappedMarketplacePluginSetup(): JSX.Element {
 		siteTransferStatus,
 		hasProductSetupError,
 		isProductSetupComplete,
-		pluginSlugToBeInstalled,
+		productSlugInstalled,
 		/**
 		 * Additional subscribed states to run tryProductInstall
 		 */
