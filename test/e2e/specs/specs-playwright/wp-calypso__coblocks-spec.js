@@ -8,6 +8,7 @@ import {
 	GutenbergEditorPage,
 	PublishedPostPage,
 	ClickToTweetBlock,
+	PricingTableBlock
 } from '@automattic/calypso-e2e';
 
 describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks' ), function () {
@@ -46,9 +47,88 @@ describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks' ), function () {
 			await gutenbergEditorPage.publish( { visit: true } );
 		} );
 
-		it( 'Click to Tweet block is visible in published post', async function () {
+		it( `${blockName } block is visible in published post`, async function () {
 			const publishedPostPage = await PublishedPostPage.Expect( this.page );
 			await publishedPostPage.confirmBlockPresence( '.wp-block-coblocks-click-to-tweet' );
 		} );
 	} );
+
+	describe( 'Pricing Table', function () {
+		let gutenbergEditorPage;
+		let insertedBlock;
+		const blockName = 'Pricing Table';
+		const price = '888'
+
+		it( 'Log in', async function () {
+			const loginFlow = new LoginFlow( this.page, 'gutenbergSimpleSiteUser' );
+			await loginFlow.logIn();
+		} );
+
+		it( 'Start new post', async function () {
+			const newPostFlow = new NewPostFlow( this.page );
+			await newPostFlow.newPostFromNavbar();
+		} );
+
+		it( 'Enter post title', async function () {
+			gutenbergEditorPage = await GutenbergEditorPage.Expect( this.page );
+			await gutenbergEditorPage.enterTitle( blockName );
+		} );
+
+		it( `Insert ${ blockName } block`, async function () {
+			insertedBlock = await gutenbergEditorPage.addBlock( blockName );
+		} );
+
+		it( 'Enter pricing', async function () {
+			const block = new PricingTableBlock( insertedBlock );
+			await block.enterPrice( 'left', price );
+		} );
+
+		it( 'Publish and visit post', async function () {
+			await gutenbergEditorPage.publish( { visit: true } );
+		} );
+
+		it( `${blockName } block is visible in published post`, async function () {
+			const publishedPostPage = await PublishedPostPage.Expect( this.page );
+			await publishedPostPage.confirmBlockPresence( '.wp-block-coblocks-pricing-table' );
+		} );
+	} );
+
+	// Parametrized test.
+	[
+		[ 'Dynamic HR', 'dynamic-separator' ],
+		[ 'Hero', 'hero' ],
+	].forEach( function ( [ blockName, selector ] ) {
+		describe( `${blockName}`, function () {
+			let gutenbergEditorPage;
+			let insertedBlock;
+
+			it( 'Log in', async function () {
+				const loginFlow = new LoginFlow( this.page, 'gutenbergSimpleSiteUser' );
+				await loginFlow.logIn();
+			} );
+
+			it( 'Start new post', async function () {
+				const newPostFlow = new NewPostFlow( this.page );
+				await newPostFlow.newPostFromNavbar();
+			} );
+
+			it( 'Enter post title', async function () {
+				gutenbergEditorPage = await GutenbergEditorPage.Expect( this.page );
+				await gutenbergEditorPage.enterTitle( blockName );
+			} );
+
+			it( `Insert ${ blockName } block`, async function () {
+				insertedBlock = await gutenbergEditorPage.addBlock( blockName );
+			} );
+
+			it( 'Publish and visit post', async function () {
+				await gutenbergEditorPage.publish( { visit: true } );
+			} );
+
+			it( `${blockName } block is visible in published post`, async function () {
+				const publishedPostPage = await PublishedPostPage.Expect( this.page );
+				await publishedPostPage.confirmBlockPresence( `.wp-block-coblocks-${selector}` );
+			} );
+		} );
+	});
 } );
