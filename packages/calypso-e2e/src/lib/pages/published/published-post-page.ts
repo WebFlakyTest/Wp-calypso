@@ -11,6 +11,9 @@ import { Page, Frame } from 'playwright';
 const selectors = {
 	page: '#main',
 
+	// Post body
+	postBody: '.entry-content',
+
 	// Like Widget
 	likeWidget: 'iframe.post-likes-widget',
 	likeButton: 'a.like',
@@ -90,5 +93,9 @@ export class PublishedPostPage extends BaseContainer {
 	async unlikePost(): Promise< void > {
 		await this._click( selectors.unlikeButton );
 		await this.frame.waitForSelector( selectors.notLikedText, { state: 'visible' } );
+	}
+
+	async confirmBlockPresence( blockSelector: string ): Promise< void > {
+		await this.page.waitForSelector( `${ selectors.postBody } ${ blockSelector }` );
 	}
 }
