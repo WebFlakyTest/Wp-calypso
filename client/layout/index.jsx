@@ -59,6 +59,7 @@ import QueryReaderTeams from 'calypso/components/data/query-reader-teams';
 import { isAutomatticTeamMember } from 'calypso/reader/lib/teams';
 import { getReaderTeams } from 'calypso/state/teams/selectors';
 import { getCurrentUser } from 'calypso/state/current-user/selectors';
+import QuerySiteFeatures from 'calypso/components/data/query-site-features';
 
 /**
  * Style dependencies
@@ -296,6 +297,7 @@ class Layout extends Component {
 				<QuerySites primaryAndRecent={ ! config.isEnabled( 'jetpack-cloud' ) } />
 				{ this.props.shouldQueryAllSites && <QuerySites allSites /> }
 				<QueryPreferences />
+				<QuerySiteFeatures siteId={ this.props.siteId } />
 				{ config.isEnabled( 'layout/query-selected-editor' ) && (
 					<QuerySiteSelectedEditor siteId={ this.props.siteId } />
 				) }
