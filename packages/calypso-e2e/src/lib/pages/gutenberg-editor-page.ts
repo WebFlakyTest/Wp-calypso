@@ -31,6 +31,10 @@ const selectors = {
 
 	// Top bar selectors.
 	publishPanelToggle: '.editor-post-publish-panel__toggle',
+	sidebarToggle: '[aria-label="Settings"]',
+
+	// Settings sidebar.
+	sidebar: '.interface-complementary-area',
 
 	// Publish panel selectors (including post-publish).
 	publishPanel: '.editor-post-publish-panel',
@@ -210,6 +214,21 @@ export class GutenbergEditorPage extends BaseContainer {
 	async openBlockInserter(): Promise< void > {
 		await this.frame.click( selectors.blockInserterToggle );
 		await this.frame.waitForSelector( selectors.blockInserterPanel );
+	}
+
+	/**
+	 * Opens the settings sidebar.
+	 *
+	 * @returns {Promise<void>} No return value.
+	 */
+	async openSidebar(): Promise< void > {
+		const isSidebarOppen = await this.frame.$eval( selectors.sidebarToggle, ( element ) =>
+			element.classList.contains( 'is-pressed' )
+		);
+		if ( ! isSidebarOppen ) {
+			await this.frame.click( selectors.sidebarToggle );
+		}
+		await this.frame.waitForSelector( selectors.sidebar );
 	}
 
 	/**

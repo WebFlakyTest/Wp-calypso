@@ -1,15 +1,47 @@
+/**
+ * Internal dependencies
+ */
 import { BaseBlock } from '../base-block';
+
+import { Frame } from 'playwright';
 
 const selectors = {
 	pricing: '.wp-block-coblocks-pricing-table-item__amount',
+	gutterControl: 'div[aria-label="Editor settings"] div[aria-label="Gutter"]',
 };
 
+/**
+ * Represents the Pricing Table coblock.
+ */
 export class PricingTableBlock extends BaseBlock {
-	async enterPrice( side: 'left' | 'right', price: string): Promise<void> {
+	/**
+	 * Enters the price to the side chosen.
+	 *
+	 * @param {'left'|'right'} side Left or right side of the block.
+	 * @param {string} price Price to be entered.
+	 * @returns {Promise<void>} No return value.
+	 */
+	async enterPrice( side: 'left' | 'right', price: string ): Promise< void > {
 		const index = side === 'left' ? 1 : 2;
 		const priceHandler = await this.block.waitForSelector(
 			`:nth-match(${ selectors.pricing }, ${ index })`
 		);
 		await priceHandler.fill( price );
+	}
+
+	/**
+	 * Given an appropriate value, select the gutter value on the settings sidebar for Pricing Table block.
+	 *
+	 * @param {string} value Value to set the gutter to.
+	 */
+	async setGutter( value: 'None' | 'Small' | 'Medium' | 'Large' | 'Huge' ): Promise< void > {
+		const frame = ( await this.block.ownerFrame() ) as Frame;
+
+		const selector = `${ selectors.gutterControl } button[aria-label="${ value }"]`;
+		await frame.click( selector );
+		await frame.$eval(
+			selector,
+			( element: any ) => element.getAttribute( 'aria-pressed' ) === 'true'
+		);
 	}
 }
