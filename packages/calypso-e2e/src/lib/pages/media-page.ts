@@ -2,7 +2,6 @@
  * External dependencies
  */
 import path from 'path';
-import assert from 'assert';
 
 /**
  * Internal dependencies
@@ -13,7 +12,7 @@ import { waitForElementEnabled } from '../../element-helper';
 /**
  * Type dependencies
  */
-import { Page } from 'playwright';
+import { ElementHandle, Page } from 'playwright';
 
 const selectors = {
 	// Navigation tabs
@@ -155,38 +154,23 @@ export class MediaPage extends BaseContainer {
 	 * @param {string} fullPath Full path to the file on disk.
 	 * @returns {Promise<void>} No return value.
 	 */
-	async upload( fullPath: string ): Promise< void > {
+	async upload( fullPath: string ): Promise< ElementHandle > {
 		await this.page.setInputFiles( selectors.addNewButton, fullPath );
-	}
 
-	/**
-	 * Confirms the media file upload was successful.
-	 *
-	 * @param {string} fullPath Full path on disk.
-	 * @returns {Promise<void>} No return value.
-	 */
-	async confirmUploadSuccessful( fullPath: string ): Promise< void > {
-		// Extract the basename and extension of the file from the full path.
-		const basename = path.basename( fullPath );
-		const gallery = await this.page.waitForSelector( selectors.gallery );
-		await gallery.waitForElementState( 'stable' );
-		// Each media item has the attribute `title=<filename.extension>` and Playwright
-		// is able to select elements by attribute.
-		await gallery.waitForSelector( `[title="${ basename }"]` );
-	}
+		const filename = path.basename( fullPath );
+		const itemSelector = `figure[title="${ filename }"]`;
+		const result = await Promise.race( [
+			this.page.waitForSelector( itemSelector ), // Upload successful
+			this.page.waitForSelector( selectors.uploadRejectionNotice ), // Upload failed
+		] );
 
-	/**
-	 * Confirms the media file upload was rejected.
-	 *
-	 * @param {string} fullPath Full path on disk.
-	 * @returns {Promise<void>} No return value.
-	 */
-	async confirmUploadRejected( fullPath: string ): Promise< void > {
-		await this.page.waitForSelector( selectors.uploadRejectionNotice );
-		const basename = path.basename( fullPath );
-		const gallery = await this.page.waitForSelector( selectors.gallery );
-		await gallery.waitForElementState( 'stable' );
-		const match = await gallery.$$( `[title="${ basename }"]` );
-		assert.strictEqual( match.length, 0 );
+		if ( ( await result.getAttribute( 'title' ) ) === filename ) {
+			return result;
+		}
+
+		const noticeText = await this.page
+			.waitForSelector( '.notice__text' )
+			.then( ( element ) => element?.innerText() );
+		throw new Error( noticeText );
 	}
 }

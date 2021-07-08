@@ -121,7 +121,7 @@ export function createTestFile( {
 	sourceFileName: string;
 } ): string {
 	testFileName = sanitize( testFileName );
-	const sourceFileDir = path.join( __dirname, '../../../../test/e2e/image-uploads/' );
+	const sourceFileDir = path.join( __dirname, '../../../../../test/e2e/image-uploads/' );
 	const sourceFilePath = path.join( sourceFileDir, sourceFileName );
 
 	// Generated test file will also go under the source directory.
