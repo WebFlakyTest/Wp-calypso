@@ -11,6 +11,7 @@ const selectors = {
 
 	// Traffic tab
 	websiteMetaTextArea: '#advanced_seo_front_page_description',
+	seoPreviewPane: '.web-preview.is-seo',
 	seoPreviewButton: '.seo-settings__preview-button',
 	seoPreviewPaneCloseButton: '.web-preview__close',
 };
