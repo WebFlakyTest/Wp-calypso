@@ -11,8 +11,8 @@ import {
 	PricingTableBlock,
 } from '@automattic/calypso-e2e';
 
-describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks' ), function () {
-	describe( 'Click to Tweet', function () {
+describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks', { parallel: false } ), function () {
+	describe( DataHelper.createSubsuiteTitle( 'Click to Tweet', { parallel: true } ), function () {
 		let gutenbergEditorPage;
 		let clickToTweetBlock;
 		const blockName = 'Click to Tweet';
@@ -53,7 +53,7 @@ describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks' ), function () {
 		} );
 	} );
 
-	describe( 'Pricing Table', function () {
+	describe( DataHelper.createSubsuiteTitle( 'Pricing Table', { parallel: true } ), function () {
 		let gutenbergEditorPage;
 		let pricingTableBlock;
 		const blockName = 'Pricing Table';
@@ -97,7 +97,7 @@ describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks' ), function () {
 		[ 'Dynamic HR', 'dynamic-separator' ],
 		[ 'Hero', 'hero' ],
 	].forEach( function ( [ blockName, selector ] ) {
-		describe( `${ blockName }`, function () {
+		describe( DataHelper.createSubsuiteTitle( blockName, { parallel: true } ), function () {
 			let gutenbergEditorPage;
 
 			it( 'Log in', async function () {
@@ -130,36 +130,39 @@ describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks' ), function () {
 		} );
 	} );
 
-	describe( 'WPCOM-specific gutter controls', function () {
-		const blockName = 'Pricing Table';
-		const gutters = [ 'None', 'Small', 'Medium', 'Large', 'Huge' ];
-		let gutenbergEditorPage;
-		let pricingTableBlock;
+	describe(
+		DataHelper.createSubsuiteTitle( 'WPCOM-specific gutter controls', { parallel: true } ),
+		function () {
+			const blockName = 'Pricing Table';
+			const gutters = [ 'None', 'Small', 'Medium', 'Large', 'Huge' ];
+			let gutenbergEditorPage;
+			let pricingTableBlock;
 
-		it( 'Log in', async function () {
-			const loginFlow = new LoginFlow( this.page, 'gutenbergSimpleSiteUser' );
-			await loginFlow.logIn();
-		} );
-
-		it( 'Start new post', async function () {
-			const newPostFlow = new NewPostFlow( this.page );
-			await newPostFlow.newPostFromNavbar();
-			gutenbergEditorPage = await GutenbergEditorPage.Expect( this.page );
-		} );
-
-		it( 'Insert Pricing Table block', async function () {
-			const blockHandle = await gutenbergEditorPage.addBlock( blockName );
-			pricingTableBlock = new PricingTableBlock( blockHandle );
-		} );
-
-		it( 'Open settings sidebar', async function () {
-			await gutenbergEditorPage.openSidebar();
-		} );
-
-		gutters.forEach( async function ( gutterValue ) {
-			it( `Set gutter value to ${ gutterValue }`, async function () {
-				await pricingTableBlock.setGutter( gutterValue );
+			it( 'Log in', async function () {
+				const loginFlow = new LoginFlow( this.page, 'gutenbergSimpleSiteUser' );
+				await loginFlow.logIn();
 			} );
-		} );
-	} );
+
+			it( 'Start new post', async function () {
+				const newPostFlow = new NewPostFlow( this.page );
+				await newPostFlow.newPostFromNavbar();
+				gutenbergEditorPage = await GutenbergEditorPage.Expect( this.page );
+			} );
+
+			it( 'Insert Pricing Table block', async function () {
+				const blockHandle = await gutenbergEditorPage.addBlock( blockName );
+				pricingTableBlock = new PricingTableBlock( blockHandle );
+			} );
+
+			it( 'Open settings sidebar', async function () {
+				await gutenbergEditorPage.openSidebar();
+			} );
+
+			gutters.forEach( async function ( gutterValue ) {
+				it( `Set gutter value to ${ gutterValue }`, async function () {
+					await pricingTableBlock.setGutter( gutterValue );
+				} );
+			} );
+		}
+	);
 } );
