@@ -6,6 +6,7 @@ module.exports = {
 		// This is a node.js project, it is ok to import node modules
 		'import/no-nodejs-modules': 'off',
 		'no-console': 'off',
+		'wpcalypso/import-docblock': 'off',
 		'require-jsdoc': [
 			'error',
 			{
