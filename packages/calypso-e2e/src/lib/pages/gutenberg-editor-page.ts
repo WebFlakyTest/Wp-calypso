@@ -192,7 +192,7 @@ export class GutenbergEditorPage extends BaseContainer {
 	async addBlock( blockName: string ): Promise< ElementHandle > {
 		const isBlockInserterOpen = await this.frame.$eval(
 			selectors.blockInserterToggle,
-			( element: any ) => element.classList.contains( 'is-pressed' )
+			( element ) => element.classList.contains( 'is-pressed' )
 		);
 		// Open the block inserter panel if not open already.
 		if ( ! isBlockInserterOpen ) {

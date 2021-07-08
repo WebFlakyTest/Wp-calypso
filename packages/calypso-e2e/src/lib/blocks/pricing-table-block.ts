@@ -39,9 +39,6 @@ export class PricingTableBlock extends BaseBlock {
 
 		const selector = `${ selectors.gutterControl } button[aria-label="${ value }"]`;
 		await frame.click( selector );
-		await frame.$eval(
-			selector,
-			( element: any ) => element.getAttribute( 'aria-pressed' ) === 'true'
-		);
+		await frame.$eval( selector, ( element ) => element.getAttribute( 'aria-pressed' ) === 'true' );
 	}
 }
