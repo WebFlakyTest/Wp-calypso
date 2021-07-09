@@ -26,8 +26,7 @@
 		"@types/node": "^15.0.2",
 		"asana-phrase": "^0.0.8",
 		"fs-extra": "^0.22.1",
-		"mockdate": "^3.0.5",
-		"sanitize-filename": "^1.6.3"
+		"mockdate": "^3.0.5"
 	},
 	"scripts": {
 		"clean": "yarn build --clean && npx rimraf dist",
