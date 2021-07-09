@@ -29,7 +29,7 @@ export const productGroups: IProductGroupCollection = {
 			[ YOAST_FREE ]: {
 				defaultPluginSlug: 'wordpress-seo',
 				pluginsToBeInstalled: [ 'wordpress-seo' ],
-				isPurchasableProduct: true,
+				isPurchasableProduct: false,
 			},
 		},
 	},

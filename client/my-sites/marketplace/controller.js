@@ -8,7 +8,7 @@ import page from 'page';
  * Internal dependencies
  */
 import { getSiteFragment } from 'calypso/lib/route';
-import { MarketplaceProductDetails } from 'calypso/my-sites/marketplace/marketplace-plugin-details';
+import { MarketplaceProductDetails } from 'calypso/my-sites/marketplace/marketplace-product-details';
 import MarketplaceDomainUpsell from 'calypso/my-sites/marketplace/marketplace-domain-upsell';
 import MarketplacePluginSetup from 'calypso/my-sites/marketplace/marketplace-plugin-setup-status';
 import MarketplaceStandaloneThankYou from 'calypso/my-sites/marketplace/marketplace-stand-alone-thank-you';

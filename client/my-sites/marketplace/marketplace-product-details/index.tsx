@@ -75,10 +75,10 @@ function MarketplaceProductDetailsPage( {
 	}, [ dispatch, pluginSlug, selectedSiteId ] );
 
 	// TODO: Remove yoast specific references here and make this call more generic
-	const onAddYoastPremiumToCart = async ( primaryDomain ) => {
+	const onAddYoastPremiumToCart = async ( primaryDomain: string ) => {
 		marketplaceDebugger( 'Added marketplace yoast to cart' );
 
-		dispatch( productToBeInstalled( productSlug, productGroupSlug, primaryDomain ) );
+		dispatch( productToBeInstalled( productGroupSlug, productSlug, primaryDomain ) );
 		const yoastProduct = fillInSingleCartItemAttributes( { product_slug: productSlug }, products );
 		return replaceProductsInCart( [ yoastProduct ] );
 	};
@@ -128,7 +128,7 @@ function MarketplaceProductDetailsPage( {
 						page( `/marketplace/domain/${ selectedSiteSlug }?flags=marketplace-yoast` )
 					}
 					onInstallPluginManually={ async ( primaryDomain ) => {
-						dispatch( productToBeInstalled( productSlug, productGroupSlug, primaryDomain ) );
+						dispatch( productToBeInstalled( productGroupSlug, productSlug, primaryDomain ) );
 						page( `/marketplace/product/setup/${ selectedSiteSlug }?flags=marketplace-yoast` );
 					} }
 				/>

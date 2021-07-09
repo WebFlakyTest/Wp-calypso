@@ -39,7 +39,7 @@ import { fetchPluginData as wporgFetchPluginData } from 'calypso/state/plugins/w
 import { getPlugin as getWporgPlugin } from 'calypso/state/plugins/wporg/selectors';
 import { IAppState } from 'calypso/state/types';
 import { getPluginsToInstall, marketplaceDebugger } from 'calypso/my-sites/marketplace/constants';
-import { IProductCollection, IProductGroupCollection } from 'calypso/my-sites/marketplace/types';
+import { IProductGroupCollection } from 'calypso/my-sites/marketplace/types';
 
 export function setPrimaryDomainCandidate(
 	domainName: string | undefined
@@ -51,8 +51,8 @@ export function setPrimaryDomainCandidate(
 }
 
 export function productToBeInstalled(
-	productSlug: keyof IProductCollection,
 	productGroupSlug: keyof IProductGroupCollection,
+	productSlug: string,
 	primaryDomain: string
 ): AnyAction {
 	return {
@@ -91,12 +91,12 @@ export function siteTransferWithPluginInstallTriggered(): AnyAction {
 
 export function pluginInstallationStateChange(
 	state: MARKETPLACE_ASYNC_PROCESS_STATUS,
-	reason = ''
+	reason = 'NOT_PROVIDED'
 ): AnyAction {
 	return {
 		type: MARKETPLACE_PLUGIN_INSTALLATION_STATE_CHANGE,
 		state,
-		reason: reason ?? 'NOT_PROVIDED',
+		reason,
 	};
 }
 
