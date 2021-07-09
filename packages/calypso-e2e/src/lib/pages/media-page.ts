@@ -24,8 +24,8 @@ const selectors = {
 	items: '.media-library__list-item',
 	placeholder: '.is-placeholder',
 	editButton: 'button[data-e2e-button="edit"]',
-	addNewButton: '.media-library__upload-button-input',
-	uploadRejectionNotice: 'text=could not be uploaded because the file type is not supported',
+	addNewButton: 'input[type="file"]',
+	uploadRejectionNotice: 'text=/could not be uploaded/i',
 
 	// Modal view
 	mediaModal: '.editor-media-modal__content',
@@ -155,22 +155,28 @@ export class MediaPage extends BaseContainer {
 	 * @returns {Promise<void>} No return value.
 	 */
 	async upload( fullPath: string ): Promise< ElementHandle > {
-		await this.page.setInputFiles( selectors.addNewButton, fullPath );
+		// Intercept the file picker dialog.
+		const [ fileChooser ] = await Promise.all( [
+			this.page.waitForEvent( 'filechooser' ),
+			this.page.click( selectors.addNewButton ),
+		] );
+		// Simulate the user selecting a file and confirming.
+		await fileChooser.setFiles( fullPath );
 
+		// From here, confirm if upload is successful or rejected.
 		const filename = path.basename( fullPath );
+		// Item in gallery have the `title=<filename>` attribute.
 		const itemSelector = `figure[title="${ filename }"]`;
 		const result = await Promise.race( [
 			this.page.waitForSelector( itemSelector ), // Upload successful
 			this.page.waitForSelector( selectors.uploadRejectionNotice ), // Upload failed
 		] );
 
+		// If the promise resolved to a result with `title` attribute, upload was successful.
 		if ( ( await result.getAttribute( 'title' ) ) === filename ) {
 			return result;
 		}
-
-		const noticeText = await this.page
-			.waitForSelector( '.notice__text' )
-			.then( ( element ) => element?.innerText() );
-		throw new Error( noticeText );
+		// Otherwise, throw the content of the error banner to the caller for further processing.
+		throw new Error( await result.innerText() );
 	}
 }

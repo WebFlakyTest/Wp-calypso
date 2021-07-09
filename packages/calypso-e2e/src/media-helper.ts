@@ -4,7 +4,6 @@
 import config from 'config';
 import fs from 'fs-extra';
 import path from 'path';
-import sanitize from 'sanitize-filename';
 
 /**
  * Internal dependencies
@@ -68,7 +67,7 @@ export function getFileName( {
 	const suiteName = name.replace( /[^a-z0-9]/gi, '-' ).toLowerCase();
 	const viewportName = getViewportName().toUpperCase();
 	const locale = getLocale().toUpperCase();
-	const date = getDateString();
+	const date = createTimestamp();
 	const fileName = `FAILED-${ locale }-${ viewportName }-${ suiteName }-${ date }`;
 
 	let dir;
@@ -91,7 +90,7 @@ export function getFileName( {
  *
  * @returns {string} Date represented as a timestamp.
  */
-export function getDateString(): string {
+export function createTimestamp(): string {
 	return new Date().getTime().toString();
 }
 
@@ -113,14 +112,8 @@ export function deleteFile( filePath: string ): void {
  * @param {string} param0.sourceFileName Basename of the source file to be cloned.
  * @returns {string} Full path to the generated test file.
  */
-export function createTestFile( {
-	testFileName,
-	sourceFileName,
-}: {
-	testFileName: string;
-	sourceFileName: string;
-} ): string {
-	testFileName = sanitize( testFileName );
+export function createTestFile( { sourceFileName }: { sourceFileName: string } ): string {
+	const testFileName = `${ createTimestamp() }.${ sourceFileName.split( '.' ).pop() }`;
 	const sourceFileDir = path.join( __dirname, '../../../../../test/e2e/image-uploads/' );
 	const sourceFilePath = path.join( sourceFileDir, sourceFileName );
 
@@ -137,19 +130,26 @@ export function createTestFile( {
 /**
  * Returns the path to a generated temporary JPEG image file.
  *
- * @param {string} filename Basename used for the generated test file.
  * @returns {string} Full path on disk to the generated test file.
  */
-export function getTestImage( filename: string ): string {
-	return createTestFile( { testFileName: filename, sourceFileName: 'image0.jpg' } );
+export function createTestImage(): string {
+	return createTestFile( { sourceFileName: 'image0.jpg' } );
 }
 
 /**
  * Returns the path to a generated temporary MP3 audio file.
  *
- * @param {string} filename Basename used for the generated test file.
  * @returns {string} Full path on disk to the generated test file.
  */
-export function getTestAudio( filename: string ): string {
-	return createTestFile( { testFileName: filename, sourceFileName: 'bees.mp3' } );
+export function createTestAudio(): string {
+	return createTestFile( { sourceFileName: 'bees.mp3' } );
+}
+
+/**
+ * Returns the path to an unsupported file.
+ *
+ * @returns {string} Full path on disk to the generated test file.
+ */
+export function createInvalidFile(): string {
+	return createTestFile( { sourceFileName: 'unsupported_extension.mkv' } );
 }

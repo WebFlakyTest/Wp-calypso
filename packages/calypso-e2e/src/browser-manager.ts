@@ -14,7 +14,7 @@ import type { Browser, BrowserContext, Page } from 'playwright';
 /**
  * Internal dependencies
  */
-import { getVideoDir, getDateString, getAssetDir } from './media-helper';
+import { getVideoDir, createTimestamp, getAssetDir } from './media-helper';
 import { getViewportSize } from './browser-helper';
 
 /**
@@ -66,7 +66,7 @@ export async function launchBrowserContext(): Promise< BrowserContext > {
 	// By default, record video for each browser context.
 	const videoDir = getVideoDir();
 	const dimension: viewportSize = getViewportSize();
-	const timestamp = getDateString();
+	const timestamp = createTimestamp();
 	const userAgent = `user-agent=Mozilla/5.0 (wp-e2e-tests) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${ await browser.version() } Safari/537.36`;
 
 	// Generate a new BrowserContext.

@@ -11,16 +11,15 @@ import {
 import assert from 'assert';
 
 describe( DataHelper.createSuiteTitle( 'Media: Upload' ), function () {
-	const basename = MediaHelper.getDateString();
 	const testFiles = {
-		image: MediaHelper.getTestImage( basename + '.jpg' ),
-		audio: MediaHelper.getTestAudio( basename + '.mp3' ),
+		image: MediaHelper.createTestImage(),
+		audio: MediaHelper.createTestAudio(),
 	};
-	const invalidFile = MediaHelper.getTestImage( basename + '' );
+	const invalidFile = MediaHelper.createInvalidFile();
 
 	// Parametrized test.
 	[
-		[ 'Simple', 'defaultUser' ],
+		// [ 'Simple', 'defaultUser' ],
 		[ 'Atomic', 'wooCommerceUser' ],
 	].forEach( function ( [ siteType, user ] ) {
 		describe( `Upload media files (${ siteType })`, function () {
@@ -47,20 +46,20 @@ describe( DataHelper.createSuiteTitle( 'Media: Upload' ), function () {
 				} );
 			} );
 
-			it( 'Upload a forbidden file type and see the rejection notice', async function () {
+			it( 'Upload an unsupported file type and see the rejection notice', async function () {
 				try {
 					await mediaPage.upload( invalidFile );
 				} catch ( error ) {
-					console.log( 'message' + error.message );
-					assert.match( error.message, /file type is not supported/ );
+					assert.match( error.message, /could not be uploaded/i );
 				}
 			} );
 		} );
+	} );
 
-		after( 'Clean up disk', async function () {
-			for ( const filepath of Object.values( testFiles ) ) {
-				MediaHelper.deleteFile( filepath );
-			}
-		} );
+	after( 'Clean up disk', async function () {
+		for ( const filepath of Object.values( testFiles ) ) {
+			MediaHelper.deleteFile( filepath );
+		}
+		MediaHelper.deleteFile( invalidFile );
 	} );
 } );
