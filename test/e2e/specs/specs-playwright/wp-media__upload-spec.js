@@ -19,7 +19,7 @@ describe( DataHelper.createSuiteTitle( 'Media: Upload' ), function () {
 
 	// Parametrized test.
 	[
-		// [ 'Simple', 'defaultUser' ],
+		[ 'Simple', 'defaultUser' ],
 		[ 'Atomic', 'wooCommerceUser' ],
 	].forEach( function ( [ siteType, user ] ) {
 		describe( `Upload media files (${ siteType })`, function () {

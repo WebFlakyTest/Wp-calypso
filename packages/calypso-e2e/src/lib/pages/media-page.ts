@@ -155,13 +155,8 @@ export class MediaPage extends BaseContainer {
 	 * @returns {Promise<void>} No return value.
 	 */
 	async upload( fullPath: string ): Promise< ElementHandle > {
-		// Intercept the file picker dialog.
-		const [ fileChooser ] = await Promise.all( [
-			this.page.waitForEvent( 'filechooser' ),
-			this.page.click( selectors.addNewButton ),
-		] );
 		// Simulate the user selecting a file and confirming.
-		await fileChooser.setFiles( fullPath );
+		await this.page.setInputFiles( selectors.addNewButton, fullPath );
 
 		// From here, confirm if upload is successful or rejected.
 		const filename = path.basename( fullPath );
