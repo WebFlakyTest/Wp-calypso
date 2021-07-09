@@ -113,44 +113,15 @@ export function randomPhrase(): string {
  * Generates a structured test suite name from environmental and user-provided parameters.
  *
  * @param {string} title Title of the test.
- * @param {{key: string}: string} param0 Object parameter.
- * @param {boolean} param0.parallel Whether to include the @parallel tag. Defaults to true.
  * @returns {string} Test suite name.
  */
-export function createSuiteTitle(
-	title: string,
-	{ parallel = true }: { parallel?: boolean } = {}
-): string {
+export function createSuiteTitle( title: string ): string {
 	const parts = [
 		`[${ getJetpackHost() }]`,
 		`${ toTitleCase( title ) }:`,
 		`(${ getViewportName() })`,
+		'@parallel',
 	];
-
-	if ( parallel ) {
-		parts.push( '@parallel' );
-	}
-
-	return parts.join( ' ' );
-}
-
-/**
- * Generates a structured test subsuite name.
- *
- * @param {string} title Title of the subsuite.
- * @param {{key: string}: string} param0 Object parameter.
- * @param {boolean} param0.parallel Whether to include the @parallel tag. Defaults to false.
- * @returns {string} Test subsuite name.
- */
-export function createSubsuiteTitle(
-	title: string,
-	{ parallel = false }: { parallel?: boolean } = {}
-): string {
-	const parts = [ `${ toTitleCase( title ) }:` ];
-
-	if ( parallel ) {
-		parts.push( '@parallel' );
-	}
 
 	return parts.join( ' ' );
 }

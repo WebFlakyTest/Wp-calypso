@@ -4,11 +4,11 @@
 import { ElementHandle } from 'playwright';
 
 /**
- * Base class for asynchronously initializing objects.
+ * Base class for the Block type objects.
  */
 export class BaseBlock {
 	[ x: string ]: any;
-	block: ElementHandle;
+	static block: ElementHandle;
 
 	/**
 	 * Constructs a concrete instance of a block.

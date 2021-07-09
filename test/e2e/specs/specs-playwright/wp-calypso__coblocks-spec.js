@@ -7,162 +7,56 @@ import {
 	NewPostFlow,
 	GutenbergEditorPage,
 	PublishedPostPage,
-	ClickToTweetBlock,
 	PricingTableBlock,
+	DynamicHRBlock,
+	HeroBlock,
 } from '@automattic/calypso-e2e';
 
-describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks', { parallel: false } ), function () {
-	describe( DataHelper.createSubsuiteTitle( 'Click to Tweet', { parallel: true } ), function () {
-		let gutenbergEditorPage;
-		let clickToTweetBlock;
-		const blockName = 'Click to Tweet';
-		const tweet =
-			'The foolish man seeks happiness in the distance. The wise grows it under his feet. — James Oppenheim';
+describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks' ), function () {
+	let gutenbergEditorPage;
+	let pricingTableBlock;
 
-		it( 'Log in', async function () {
-			const loginFlow = new LoginFlow( this.page, 'gutenbergSimpleSiteUser' );
-			await loginFlow.logIn();
-		} );
-
-		it( 'Start new post', async function () {
-			const newPostFlow = new NewPostFlow( this.page );
-			await newPostFlow.newPostFromNavbar();
-			gutenbergEditorPage = await GutenbergEditorPage.Expect( this.page );
-		} );
-
-		it( 'Enter post title', async function () {
-			await gutenbergEditorPage.enterTitle( blockName );
-		} );
-
-		it( `Insert ${ blockName } block`, async function () {
-			const blockHandle = await gutenbergEditorPage.addBlock( blockName );
-			clickToTweetBlock = new ClickToTweetBlock( blockHandle );
-		} );
-
-		it( 'Enter tweet content', async function () {
-			await clickToTweetBlock.enterTweetContent( tweet );
-		} );
-
-		it( 'Publish and visit post', async function () {
-			await gutenbergEditorPage.publish( { visit: true } );
-		} );
-
-		it( `${ blockName } block is visible in published post`, async function () {
-			const publishedPostPage = await PublishedPostPage.Expect( this.page );
-			await publishedPostPage.confirmBlockPresence( '.wp-block-coblocks-click-to-tweet' );
-		} );
+	it( 'Log in', async function () {
+		const loginFlow = new LoginFlow( this.page, 'gutenbergSimpleSiteUser' );
+		await loginFlow.logIn();
 	} );
 
-	describe( DataHelper.createSubsuiteTitle( 'Pricing Table', { parallel: true } ), function () {
-		let gutenbergEditorPage;
-		let pricingTableBlock;
-		const blockName = 'Pricing Table';
-		const price = '888';
-
-		it( 'Log in', async function () {
-			const loginFlow = new LoginFlow( this.page, 'gutenbergSimpleSiteUser' );
-			await loginFlow.logIn();
-		} );
-
-		it( 'Start new post', async function () {
-			const newPostFlow = new NewPostFlow( this.page );
-			await newPostFlow.newPostFromNavbar();
-			gutenbergEditorPage = await GutenbergEditorPage.Expect( this.page );
-		} );
-
-		it( 'Enter post title', async function () {
-			await gutenbergEditorPage.enterTitle( blockName );
-		} );
-
-		it( `Insert ${ blockName } block`, async function () {
-			const blockHandle = await gutenbergEditorPage.addBlock( blockName );
-			pricingTableBlock = new PricingTableBlock( blockHandle );
-		} );
-
-		it( 'Enter pricing', async function () {
-			await pricingTableBlock.enterPrice( 'left', price );
-		} );
-
-		it( 'Publish and visit post', async function () {
-			await gutenbergEditorPage.publish( { visit: true } );
-		} );
-
-		it( `${ blockName } block is visible in published post`, async function () {
-			const publishedPostPage = await PublishedPostPage.Expect( this.page );
-			await publishedPostPage.confirmBlockPresence( '.wp-block-coblocks-pricing-table' );
-		} );
+	it( 'Start new post', async function () {
+		const newPostFlow = new NewPostFlow( this.page );
+		await newPostFlow.newPostFromNavbar();
+		gutenbergEditorPage = await GutenbergEditorPage.Expect( this.page );
 	} );
 
-	[
-		[ 'Dynamic HR', 'dynamic-separator' ],
-		[ 'Hero', 'hero' ],
-	].forEach( function ( [ blockName, selector ] ) {
-		describe( DataHelper.createSubsuiteTitle( blockName, { parallel: true } ), function () {
-			let gutenbergEditorPage;
-
-			it( 'Log in', async function () {
-				const loginFlow = new LoginFlow( this.page, 'gutenbergSimpleSiteUser' );
-				await loginFlow.logIn();
-			} );
-
-			it( 'Start new post', async function () {
-				const newPostFlow = new NewPostFlow( this.page );
-				await newPostFlow.newPostFromNavbar();
-				gutenbergEditorPage = await GutenbergEditorPage.Expect( this.page );
-			} );
-
-			it( 'Enter post title', async function () {
-				await gutenbergEditorPage.enterTitle( blockName );
-			} );
-
-			it( `Insert ${ blockName } block`, async function () {
-				await gutenbergEditorPage.addBlock( blockName );
-			} );
-
-			it( 'Publish and visit post', async function () {
-				await gutenbergEditorPage.publish( { visit: true } );
-			} );
-
-			it( `${ blockName } block is visible in published post`, async function () {
-				const publishedPostPage = await PublishedPostPage.Expect( this.page );
-				await publishedPostPage.confirmBlockPresence( `.wp-block-coblocks-${ selector }` );
-			} );
-		} );
+	it( 'Enter post title', async function () {
+		await gutenbergEditorPage.enterTitle( DataHelper.randomPhrase() );
 	} );
 
-	describe(
-		DataHelper.createSubsuiteTitle( 'WPCOM-specific gutter controls', { parallel: true } ),
-		function () {
-			const blockName = 'Pricing Table';
-			const gutters = [ 'None', 'Small', 'Medium', 'Large', 'Huge' ];
-			let gutenbergEditorPage;
-			let pricingTableBlock;
+	it( 'Insert Pricing Table block and enter price to left table', async function () {
+		const blockHandle = await gutenbergEditorPage.addBlock( 'Pricing Table' );
+		pricingTableBlock = new PricingTableBlock( blockHandle );
+		const price = 888;
+		await pricingTableBlock.enterPrice( 'left', price );
+	} );
 
-			it( 'Log in', async function () {
-				const loginFlow = new LoginFlow( this.page, 'gutenbergSimpleSiteUser' );
-				await loginFlow.logIn();
-			} );
+	it( 'Insert Dynamic HR block', async function () {
+		await gutenbergEditorPage.addBlock( 'Dynamic HR' );
+	} );
 
-			it( 'Start new post', async function () {
-				const newPostFlow = new NewPostFlow( this.page );
-				await newPostFlow.newPostFromNavbar();
-				gutenbergEditorPage = await GutenbergEditorPage.Expect( this.page );
-			} );
+	it( 'Insert Hero block', async function () {
+		await gutenbergEditorPage.addBlock( 'Hero' );
+	} );
 
-			it( 'Insert Pricing Table block', async function () {
-				const blockHandle = await gutenbergEditorPage.addBlock( blockName );
-				pricingTableBlock = new PricingTableBlock( blockHandle );
-			} );
+	it( 'Publish and visit post', async function () {
+		await gutenbergEditorPage.publish( { visit: true } );
+		await PublishedPostPage.Expect( this.page );
+	} );
 
-			it( 'Open settings sidebar', async function () {
-				await gutenbergEditorPage.openSidebar();
-			} );
-
-			gutters.forEach( async function ( gutterValue ) {
-				it( `Set gutter value to ${ gutterValue }`, async function () {
-					await pricingTableBlock.setGutter( gutterValue );
-				} );
-			} );
-		}
-	);
+	[ 'Pricing Table', 'Dynamic HR', 'Hero' ].forEach( function ( blockName ) {
+		it( `Confirm ${ blockName } is visible in published post`, async function () {
+			const blockClassName = `${ blockName.replace( /\s/g, '' ) }Block`;
+			// eval() will allow us to call the static function of each block from
+			// the string representation of the name.
+			await eval( blockClassName ).validatePublishedContent( this.page );
+		} );
+	} );
 } );

@@ -20,7 +20,7 @@ const selectors = {
 	editorBody: '.edit-post-visual-editor',
 
 	// Block inserter
-	blockInserterToggle: '[aria-label="Toggle block inserter"]',
+	blockInserterToggle: 'button.edit-post-header-toolbar__inserter-toggle',
 	blockInserterPanel: '.block-editor-inserter__content',
 	blockSearch: '[placeholder="Search"]',
 	blockInserterResultItem: '.block-editor-block-types-list__list-item',
@@ -31,16 +31,16 @@ const selectors = {
 
 	// Top bar selectors.
 	publishPanelToggle: '.editor-post-publish-panel__toggle',
-	sidebarToggle: '[aria-label="Settings"]',
+	settingsToggle: '[aria-label="Settings"]',
 
 	// Settings sidebar.
-	sidebar: '.interface-complementary-area',
+	settingsPanel: '.interface-complementary-area',
 
 	// Publish panel selectors (including post-publish).
 	publishPanel: '.editor-post-publish-panel',
 	publishButton:
 		'.editor-post-publish-panel__header-publish-button button.editor-post-publish-button',
-	viewPostButton: 'text=View Post',
+	viewPostButton: ':text("View Post")',
 };
 
 /**
@@ -190,17 +190,12 @@ export class GutenbergEditorPage extends BaseContainer {
 	 * @param {string} blockName Name of the block to be inserted.
 	 */
 	async addBlock( blockName: string ): Promise< ElementHandle > {
-		const isBlockInserterOpen = await this.frame.$eval(
-			selectors.blockInserterToggle,
-			( element ) => element.classList.contains( 'is-pressed' )
-		);
-		// Open the block inserter panel if not open already.
-		if ( ! isBlockInserterOpen ) {
-			await this.openBlockInserter();
-		}
-
+		// Click on the editor title. This has the effect of dismissing the block inserter
+		// if open, and restores focus back to the editor root container, allowing insertion
+		// of blocks.
+		await this.frame.click( selectors.editorTitle );
+		await this.openBlockInserter();
 		await this.frame.fill( selectors.blockSearch, blockName );
-
 		await this.frame.click( `${ selectors.blockInserterResultItem }:has-text("${ blockName }")` );
 		// Confirm the block has been added to the editor body.
 		return await this.frame.waitForSelector( `[aria-label="Block: ${ blockName }"]` );
@@ -221,14 +216,18 @@ export class GutenbergEditorPage extends BaseContainer {
 	 *
 	 * @returns {Promise<void>} No return value.
 	 */
-	async openSidebar(): Promise< void > {
-		const isSidebarOppen = await this.frame.$eval( selectors.sidebarToggle, ( element ) =>
+	async openSettings(): Promise< void > {
+		const isSidebarOppen = await this.frame.$eval( selectors.settingsToggle, ( element ) =>
 			element.classList.contains( 'is-pressed' )
 		);
 		if ( ! isSidebarOppen ) {
-			await this.frame.click( selectors.sidebarToggle );
+			await this.frame.click( selectors.settingsToggle );
 		}
-		await this.frame.waitForSelector( selectors.sidebar );
+		const settingsToggle = await this.frame.waitForSelector( selectors.settingsToggle );
+		await this.frame.waitForFunction(
+			( element ) => element.getAttribute( 'aria-pressed' ) === 'true',
+			settingsToggle
+		);
 	}
 
 	/**

@@ -3,14 +3,17 @@
  */
 import { BaseBlock } from '../base-block';
 
+import { Page } from 'playwright';
+
 const selectors = {
+	block: '.wp-block-coblocks-click-to-tweet',
 	tweetContent: '.wp-block-coblocks-click-to-tweet__text',
 };
 
 /**
  * Represents the Click to Tweet coblock.
  */
-export class ClickToTweetBlock extends BaseBlock {
+export class ClicktoTweetBlock extends BaseBlock {
 	/**
 	 * Given a text string, enters the text into the main tweet body.
 	 *
@@ -20,5 +23,9 @@ export class ClickToTweetBlock extends BaseBlock {
 	async enterTweetContent( text: string ): Promise< void > {
 		const textArea = await this.block.waitForSelector( selectors.tweetContent );
 		await textArea.fill( text );
+	}
+
+	static async validatePublishedContent( page: Page ): Promise< void > {
+		await page.isVisible( selectors.block );
 	}
 }

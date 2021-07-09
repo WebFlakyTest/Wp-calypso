@@ -3,9 +3,10 @@
  */
 import { BaseBlock } from '../base-block';
 
-import { Frame } from 'playwright';
+import { Frame, Page } from 'playwright';
 
 const selectors = {
+	block: '.wp-block-coblocks-pricing-table',
 	pricing: '.wp-block-coblocks-pricing-table-item__amount',
 	gutterControl: 'div[aria-label="Editor settings"] div[aria-label="Gutter"]',
 };
@@ -21,12 +22,12 @@ export class PricingTableBlock extends BaseBlock {
 	 * @param {string} price Price to be entered.
 	 * @returns {Promise<void>} No return value.
 	 */
-	async enterPrice( side: 'left' | 'right', price: string ): Promise< void > {
+	async enterPrice( side: 'left' | 'right', price: string | number ): Promise< void > {
 		const index = side === 'left' ? 1 : 2;
 		const priceHandler = await this.block.waitForSelector(
 			`:nth-match(${ selectors.pricing }, ${ index })`
 		);
-		await priceHandler.fill( price );
+		await priceHandler.fill( price.toString() );
 	}
 
 	/**
@@ -34,11 +35,19 @@ export class PricingTableBlock extends BaseBlock {
 	 *
 	 * @param {string} value Value to set the gutter to.
 	 */
-	async setGutter( value: 'None' | 'Small' | 'Medium' | 'Large' | 'Huge' ): Promise< void > {
+	async setGutter( value: 'None' | 'Small' | 'Medium' | 'Large' | 'Huge' ): Promise< boolean > {
 		const frame = ( await this.block.ownerFrame() ) as Frame;
 
 		const selector = `${ selectors.gutterControl } button[aria-label="${ value }"]`;
 		await frame.click( selector );
-		await frame.$eval( selector, ( element ) => element.getAttribute( 'aria-pressed' ) === 'true' );
+		return await frame.$eval(
+			selector,
+			( element ) => element.getAttribute( 'aria-pressed' ) === 'true'
+		);
+	}
+
+	static async validatePublishedContent( page: Page ): Promise< void > {
+		await page.isVisible( selectors.pricing );
+		await page.isVisible( selectors.block );
 	}
 }
