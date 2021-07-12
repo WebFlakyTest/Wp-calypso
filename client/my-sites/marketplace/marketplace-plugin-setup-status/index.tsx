@@ -43,7 +43,6 @@ import { getPluginsToInstall, marketplaceDebugger } from 'calypso/my-sites/marke
  * Style dependencies
  */
 import 'calypso/my-sites/marketplace/marketplace-plugin-setup-status/style.scss';
-import { IProductGroupCollection } from 'calypso/my-sites/marketplace/types';
 
 /**
  * This page busy waits and installs any plugins that are required in the marketplace purchase flow.
@@ -87,17 +86,20 @@ function WrappedMarketplacePluginSetup(): JSX.Element {
 	useEffect( () => {
 		if ( ! selectedSiteSlug ) {
 			page( '/home' );
-		} else if ( ! productSlugInstalled ) {
+		} else if ( ! productSlugInstalled || ! productGroupSlug ) {
 			marketplaceDebugger(
-				'::MARKETPLACE::ERROR:: There is an error in plugin setup page productSlugInstalled is not provided'
+				'::MARKETPLACE::ERROR:: There is an error in plugin setup page, productSlugInstalled or productGroupSlug is not provided'
 			);
 			page( `/home/${ selectedSiteSlug }` );
 		} else {
+			const plugins = getPluginsToInstall( productGroupSlug, productSlugInstalled );
+			if ( ! Array.isArray( plugins ) || plugins.length === 0 ) {
+				marketplaceDebugger(
+					'::MARKETPLACE::ERROR:: There is an error in plugin setup page, plugins to install are not available'
+				);
+				page( `/home/${ selectedSiteSlug }` );
+			}
 			// TODO: handle installation of multiple plugins
-			const plugins =
-				productGroupSlug &&
-				productSlugInstalled &&
-				getPluginsToInstall( productGroupSlug, productSlugInstalled );
 			Array.isArray( plugins ) && setPluginSlugToBeInstalled( plugins[ 0 ] );
 		}
 	}, [
@@ -111,11 +113,8 @@ function WrappedMarketplacePluginSetup(): JSX.Element {
 	useEffect( () => {
 		if ( hasProductSetupError ) {
 			marketplaceDebugger( '::MARKETPLACE::ERROR:: There is an error in product setup' );
-			const productGroupSlug: keyof IProductGroupCollection = findProductGroup(
-				productSlugInstalled
-			);
 			selectedSiteSlug &&
-				productSlugInstalled &&
+				productGroupSlug &&
 				navigateToProductHomePage( selectedSiteSlug, productGroupSlug );
 		} else if ( isProductSetupComplete ) {
 			/**
@@ -131,14 +130,14 @@ function WrappedMarketplacePluginSetup(): JSX.Element {
 	}, [
 		dispatch,
 		selectedSiteSlug,
-		pluginInstallationStatus,
-		siteTransferStatus,
 		hasProductSetupError,
 		isProductSetupComplete,
-		productSlugInstalled,
+		productGroupSlug,
 		/**
 		 * Additional subscribed states to run tryProductInstall
 		 */
+		pluginInstallationStatus,
+		siteTransferStatus,
 		pluginStatus,
 		automatedTransferFetchingStatus,
 		automatedTransferStatus,

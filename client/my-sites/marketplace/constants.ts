@@ -8,6 +8,7 @@ import { YOAST_PREMIUM, YOAST_FREE } from '@automattic/calypso-products';
  * Internal dependencies
  */
 import {
+	IProductDefinition,
 	IProductCollection,
 	IProductGroupCollection,
 	YOAST,
@@ -38,9 +39,9 @@ export const productGroups: IProductGroupCollection = {
 /**
  * Provides the plugin that needs to be installed for a given product
  *
- * @param {string} productGroupSlug The product group the product belongs to.
+ * @param {string} productGroupSlug The product group the product belongs to
  * @param {string} productSlug The product slug being setup.
- * @returns {array[string]} An array of plugin slugs, returns null if product does slug not exist.
+ * @returns {array[string]} An array of plugin slugs, returns null if product does slug not exist
  */
 export function getPluginsToInstall(
 	productGroupSlug: keyof IProductGroupCollection,
@@ -53,7 +54,7 @@ export function getPluginsToInstall(
 /**
  * Provides the first product found in the product group definition
  *
- * @param {string} productGroupSlug The product group required.
+ * @param {string} productGroupSlug The product group required.\
  * @returns {string} The product slug
  */
 export function getDefaultProductInProductGroup(
@@ -71,8 +72,8 @@ export function getDefaultProductInProductGroup(
 /**
  * Provides the first plugin found in the product definitions
  *
- * @param {string} productGroupSlug The product group the product belongs to.
- * @param {string} productSlug The product slug being setup.
+ * @param {string} productGroupSlug The product group the product belongs to
+ * @param {string} productSlug The product slug being setup
  * @returns {string} The plugin slug
  */
 export function getDefaultPluginInProduct(
@@ -81,4 +82,25 @@ export function getDefaultPluginInProduct(
 ): string | null {
 	const { defaultPluginSlug } = productGroups[ productGroupSlug ]?.products[ productSlug ] ?? {};
 	return defaultPluginSlug ? defaultPluginSlug : null;
+}
+
+/**
+ * Provides the first plugin found in the product definitions
+ *
+ * @param {string} productGroupSlug The product group the product belongs to
+ * @param {string} productSlug The product slug
+ * @returns {string} The product details
+ */
+export function getProductDefinition(
+	productGroupSlug: keyof IProductGroupCollection,
+	productSlug: keyof IProductCollection
+): IProductDefinition | null {
+	const productDefinition = productGroups[ productGroupSlug ]?.products[ productSlug ];
+	if ( ! productDefinition ) {
+		marketplaceDebugger(
+			`Product does not exist for provided parameters: ${ productGroupSlug }, ${ productSlug }`
+		);
+		return null;
+	}
+	return productDefinition;
 }
