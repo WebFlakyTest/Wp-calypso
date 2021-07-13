@@ -48,7 +48,6 @@ import {
 	createStripeMethod,
 	createStripePaymentMethodStore,
 } from './lib/payment-methods/stripe-credit-card-fields';
-import { createExistingCardMethod } from './lib/payment-methods/existing-credit-card';
 import CheckoutOrderSummaryStep, {
 	CheckoutOrderSummary,
 	CheckoutOrderSummaryStepTitle,
@@ -109,7 +108,6 @@ export {
 	checkoutTheme,
 	createAlipayMethod,
 	createAlipayPaymentMethodStore,
-	createExistingCardMethod,
 	createIdealMethod,
 	createIdealPaymentMethodStore,
 	createRegistry,
