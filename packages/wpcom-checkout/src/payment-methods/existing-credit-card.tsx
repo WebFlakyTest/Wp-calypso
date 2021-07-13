@@ -6,17 +6,25 @@ import styled from '@emotion/styled';
 import debugFactory from 'debug';
 import { sprintf } from '@wordpress/i18n';
 import { useI18n } from '@wordpress/react-i18n';
+import {
+	Button,
+	FormStatus,
+	useLineItems,
+	useFormStatus,
+	useEvents,
+} from '@automattic/composite-checkout';
+import type { PaymentMethod, ProcessPayment, LineItem } from '@automattic/composite-checkout';
 
 /**
  * Internal dependencies
  */
-import Button from '../../components/button';
-import { FormStatus, useLineItems, useEvents } from '../../public-api';
-import { SummaryLine, SummaryDetails } from '../styled-components/summary-details';
-import { useFormStatus } from '../form-status';
-import PaymentLogo from './payment-logo.js';
+import { SummaryLine, SummaryDetails } from '../summary-details';
+import { PaymentLogo } from '../payment-method-logos';
 
 const debug = debugFactory( 'composite-checkout:existing-card-payment-method' );
+
+// Disabling this to make migration easier
+/* eslint-disable @typescript-eslint/no-use-before-define */
 
 export function createExistingCardMethod( {
 	id,
@@ -28,7 +36,17 @@ export function createExistingCardMethod( {
 	paymentMethodToken,
 	paymentPartnerProcessorId,
 	activePayButtonText = undefined,
-} ) {
+}: {
+	id: string;
+	cardholderName: string;
+	cardExpiry: string;
+	brand: string;
+	last4: string;
+	storedDetailsId: string;
+	paymentMethodToken: string;
+	paymentPartnerProcessorId: string;
+	activePayButtonText: string | undefined;
+} ): PaymentMethod {
 	debug( 'creating a new existing credit card payment method', {
 		id,
 		cardholderName,
@@ -68,7 +86,7 @@ export function createExistingCardMethod( {
 	};
 }
 
-function formatDate( cardExpiry ) {
+function formatDate( cardExpiry: string ): string {
 	const expiryDate = new Date( cardExpiry );
 	const formattedDate = expiryDate.toLocaleDateString( 'en-US', {
 		month: '2-digit',
@@ -78,7 +96,17 @@ function formatDate( cardExpiry ) {
 	return formattedDate;
 }
 
-export function ExistingCardLabel( { last4, cardExpiry, cardholderName, brand } ) {
+export function ExistingCardLabel( {
+	last4,
+	cardExpiry,
+	cardholderName,
+	brand,
+}: {
+	last4: string;
+	cardExpiry: string;
+	cardholderName: string;
+	brand: string;
+} ): JSX.Element {
 	const { __, _x } = useI18n();
 
 	/* translators: %s is the last 4 digits of the credit card number */
@@ -110,10 +138,27 @@ function ExistingCardPayButton( {
 	paymentMethodToken,
 	paymentPartnerProcessorId,
 	activeButtonText = undefined,
+}: {
+	disabled?: boolean;
+	onClick?: ProcessPayment;
+	cardholderName: string;
+	storedDetailsId: string;
+	paymentMethodToken: string;
+	paymentPartnerProcessorId: string;
+	activeButtonText: string | undefined;
 } ) {
 	const [ items, total ] = useLineItems();
 	const { formStatus } = useFormStatus();
 	const onEvent = useEvents();
+
+	// This must be typed as optional because it's injected by cloning the
+	// element in CheckoutSubmitButton, but the uncloned element does not have
+	// this prop yet.
+	if ( ! onClick ) {
+		throw new Error(
+			'Missing onClick prop; ExistingCardPayButton must be used as a payment button in CheckoutSubmitButton'
+		);
+	}
 
 	return (
 		<Button
@@ -142,19 +187,37 @@ function ExistingCardPayButton( {
 	);
 }
 
-function ButtonContents( { formStatus, total, activeButtonText = undefined } ) {
+function ButtonContents( {
+	formStatus,
+	total,
+	activeButtonText = undefined,
+}: {
+	formStatus: string;
+	total: LineItem;
+	activeButtonText: string | undefined;
+} ): JSX.Element {
 	const { __ } = useI18n();
 	if ( formStatus === FormStatus.SUBMITTING ) {
-		return __( 'Processing…' );
+		return <>{ __( 'Processing…' ) }</>;
 	}
 	if ( formStatus === FormStatus.READY ) {
 		/* translators: %s is the total to be paid in localized currency */
-		return activeButtonText || sprintf( __( 'Pay %s' ), total.amount.displayValue );
+		return <>{ activeButtonText || sprintf( __( 'Pay %s' ), total.amount.displayValue ) }</>;
 	}
-	return __( 'Please wait…' );
+	return <>{ __( 'Please wait…' ) }</>;
 }
 
-function ExistingCardSummary( { cardholderName, cardExpiry, brand, last4 } ) {
+function ExistingCardSummary( {
+	cardholderName,
+	cardExpiry,
+	brand,
+	last4,
+}: {
+	cardholderName: string;
+	cardExpiry: string;
+	brand: string;
+	last4: string;
+} ) {
 	const { __, _x } = useI18n();
 
 	/* translators: %s is the last 4 digits of the credit card number */
