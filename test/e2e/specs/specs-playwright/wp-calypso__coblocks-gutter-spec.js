@@ -6,7 +6,6 @@ import {
 	LoginFlow,
 	NewPostFlow,
 	GutenbergEditorPage,
-	PublishedPostPage,
 	PricingTableBlock,
 } from '@automattic/calypso-e2e';
 import assert from 'assert';

@@ -25,6 +25,11 @@ export class ClicktoTweetBlock extends BaseBlock {
 		await textArea.fill( text );
 	}
 
+	/**
+	 * Validates block on the page.
+	 *
+	 * @param {Page} page Page on which to verify the presence of the block.
+	 */
 	static async validatePublishedContent( page: Page ): Promise< void > {
 		await page.isVisible( selectors.block );
 	}

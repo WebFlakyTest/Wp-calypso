@@ -8,8 +8,8 @@ import {
 	GutenbergEditorPage,
 	PublishedPostPage,
 	PricingTableBlock,
-	DynamicHRBlock,
-	HeroBlock,
+	DynamicHRBlock, //eslint-disable-line no-unused-vars
+	HeroBlock, //eslint-disable-line no-unused-vars
 } from '@automattic/calypso-e2e';
 
 describe( DataHelper.createSuiteTitle( 'Gutenberg: CoBlocks' ), function () {
