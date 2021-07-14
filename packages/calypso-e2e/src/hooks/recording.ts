@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import * as fs from 'fs/promises';
 import { Context } from 'mocha';
-
-/**
- * Internal dependencies
- */
 import { getFileName } from '../media-helper';
 
 /**

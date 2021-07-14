@@ -203,6 +203,7 @@ module.exports = {
 				'client/sections-helper.js',
 				'packages/accessible-focus/**/*',
 				'packages/calypso-products/**/*',
+				'packages/calypso-e2e/**/*',
 				'test/e2e/**/*',
 			],
 			rules: {

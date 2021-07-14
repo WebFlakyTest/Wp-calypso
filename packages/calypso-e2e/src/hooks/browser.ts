@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { Context } from 'mocha';
-
-/**
- * Internal dependencies
- */
 import { start, close } from '../browser-manager';
 
 /**

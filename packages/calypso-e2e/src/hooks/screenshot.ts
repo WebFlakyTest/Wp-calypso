@@ -1,11 +1,4 @@
-/**
- * Internal dependencies
- */
 import { getFileName } from '../media-helper';
-
-/**
- * Type dependencies
- */
 import type { Context } from 'mocha';
 
 /**
