@@ -1,0 +1,57 @@
+name: E2E Testing
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      CONFIG_ENV: release
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.17.3
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.17.3
+      - name: Update Node
+        run: |
+          set +e
+          set +x
+          export NVM_DIR="$HOME/.nvm" && (
+            git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
+            cd "$NVM_DIR"
+            git checkout v0.35.3
+          ) && \. "$NVM_DIR/nvm.sh" --no-use
+          nvm install
+          nvm use
+      - name: Install Linux deps
+        run: |
+          sudo apt update
+          sudo apt-get install -y libsecret-1-dev
+      - name: Desktop Install App deps
+        run: |
+          source "$HOME/.nvm/nvm.sh"
+          nvm use
+          npm install -g yarn
+          yarn run build-desktop:install-app-deps
+      - name: Build Desktop Linux
+        env:
+          CSC_LINK: resource/certificates/win.p12
+        run: |
+          set +e
+          source $HOME/.nvm/nvm.sh
+          nvm use
+
+          # Build all artifacts only when project config changes.
+          # Otherwise only build application executable required for end-to-end testing.
+          ! git diff --name-only origin/trunk...HEAD | grep -E -q 'desktop/package.json|desktop/yarn.lock' && ELECTRON_BUILDER_ARGS='-c.linux.target=dir'
+
+          ELECTRON_BUILDER_ARGS=$ELECTRON_BUILDER_ARGS yarn run build-desktop
+      - name: e2e Tests
+        run: |
+          source $HOME/.nvm/nvm.sh
+          nvm use
+          npm install -g yarn
+
+          yarn run test-desktop:e2e
