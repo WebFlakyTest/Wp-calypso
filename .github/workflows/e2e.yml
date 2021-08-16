@@ -14,17 +14,17 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.17.3
-      - name: Update Node
-        run: |
-          set +e
-          set +x
-          export NVM_DIR="$HOME/.nvm" && (
-            git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
-            cd "$NVM_DIR"
-            git checkout v0.35.3
-          ) && \. "$NVM_DIR/nvm.sh" --no-use
-          nvm install
-          nvm use
+      # - name: Update Node
+      #   run: |·
+      #     set +e
+      #     set +x
+      #     export NVM_DIR="$HOME/.nvm" && (
+      #       git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
+      #       cd "$NVM_DIR"
+      #       git checkout v0.35.3
+      #     ) && \. "$NVM_DIR/nvm.sh" --no-use
+      #     nvm install
+      #     nvm use
       - name: Install Linux deps
         run: |
           sudo apt update
