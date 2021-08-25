@@ -19,6 +19,7 @@ jobs:
           set +e
           set +x
           export NVM_DIR="$HOME/.nvm" && (
+            rm -r "$NVM_DIR"
             git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
             cd "$NVM_DIR"
             git checkout v0.35.3
